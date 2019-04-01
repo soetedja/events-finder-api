@@ -1,4 +1,4 @@
-const Location = require('../models/location.model');
+const Locations = require('../models/location.model');
 
 const validateLocationInput = require('../validators/location/location.validate');
 
@@ -10,11 +10,11 @@ exports.Create = (req, res) => {
     return res.status(400).json(errors);
   }
 
-  Location.findOne({ title: req.body.title }).then(location => {
+  Locations.findOne({ title: req.body.title }).then(location => {
     if (location) {
       return res.status(400).json({ title: 'Title already exists' });
     } else {
-      const newLocation = new Location();
+      const newLocation = new Locations();
 
       Object.assign(newLocation, req.body);
 

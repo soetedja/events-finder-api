@@ -9,39 +9,25 @@ const LocationProps = {
     type: String,
     required: true
   },
-  addressline1: {
+  formatted_address: {
     type: String,
     required: true
   },
-  addressline2: {
-    type: String
-  },
-  latitude: {
-    type: String
-  },
-  longitude: {
-    type: String
-  },
-  description: {
-    type: String,
+  lat: {
+    type: mongoose.Types.Decimal128,
     required: true
   },
-  district: {
+  lng: {
+    type: mongoose.Types.Decimal128,
+    required: true
+  },
+  icon: {
     type: String
   },
-  gmapsurl: {
+  place_id: {
     type: String
   },
-  postalcode: {
-    type: String
-  },
-  province: {
-    type: String
-  },
-  regency: {
-    type: String
-  },
-  village: {
+  url: {
     type: String
   }
   // status: {

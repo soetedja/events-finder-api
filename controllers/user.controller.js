@@ -1,5 +1,6 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const { OAuth2Client } = require('google-auth-library');
 
 const keys = require('../config/keys');
 const appConfig = require('../config/app.config');
@@ -40,6 +41,80 @@ exports.Register = (req, res) => {
       });
     }
   });
+};
+
+exports.GoogleSignIn = async (req, res) => {
+  try {
+    // const oAuth2Client = await getAuthenticatedClient();
+    const oAuth2Client = new OAuth2Client(
+      keys.google.client_id,
+      keys.google.client_secret,
+      keys.google.redirect_uris[0]
+    );
+    const tokenInfo = await oAuth2Client.getTokenInfo(req.body.accessToken);
+
+    console.log(tokenInfo);
+
+    // Error invalid token
+    if (tokenInfo.email !== req.body.email) {
+      const errors = {};
+
+      errors.token = 'Invalid Token';
+
+      return res.status(400).json(errors);
+    }
+
+    const loggedUser = await User.findOne({ email: req.body.email }).then(
+      user => {
+        if (!user) {
+          const newUser = new User({
+            email: req.body.email,
+            username: req.body.username,
+            firstname: req.body.firstname,
+            lastname: req.body.lastname,
+            avatar: req.body.avatar,
+            authenticationtype: 'google'
+          });
+
+          const result = newUser
+            .save()
+            .then(userResult => userResult)
+            .catch(errSave => errSave);
+
+          return result;
+        }
+
+        return user;
+      }
+    );
+
+    // Create JWT payload
+    if (loggedUser._id) {
+      const payload = {
+        id: loggedUser.id,
+        name: `${loggedUser.firstname} ${loggedUser.lastname}`,
+        avatar: loggedUser.avatar
+      };
+
+      // Sign token
+      jwt.sign(
+        payload,
+        keys.secretOrKey,
+        { expiresIn: appConfig.tokenExpiration },
+        (err, token) => {
+          if (err) {
+            res.status(500).json(err);
+          }
+          res.json({
+            success: true,
+            token: `Bearer ${token}`
+          });
+        }
+      );
+    }
+  } catch (error) {
+    res.status(500).json(error);
+  }
 };
 
 exports.Login = (req, res) => {

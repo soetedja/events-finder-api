@@ -10,10 +10,15 @@ const UserController = require('../controllers/user.controller');
 // @access  Public
 router.post('/register', UserController.Register);
 
-// @route   GET api/users/login
+// @route   POST api/users/login
 // @desc    Login User / Returning JWT Token
 // @access  Public
 router.post('/login', UserController.Login);
+
+// @route   POST api/users/googleSignIn
+// @desc    Sign in user with google token
+// @access  Public
+router.post('/googleSignIn', UserController.GoogleSignIn);
 
 // Require('../../config/passport')(passport);
 // @route   GET api/users/current

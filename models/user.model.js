@@ -21,10 +21,13 @@ const UserProps = {
     type: String
   },
   password: {
-    type: String,
-    required: true
+    type: String
+    // required: true
   },
   gender: {
+    type: String
+  },
+  authenticationtype: {
     type: String
   },
   // status: {

@@ -14,25 +14,33 @@ const EventProps = {
     type: String,
     required: true
   },
-  startDate: {
+  start: {
     type: Date,
     required: true
   },
-  endDate: {
+  end: {
     type: Date,
     required: true
   },
   poster: {
     type: String
   },
-  drink: {
+  status: {
     type: String,
     enum: ['Active', 'Inactive']
   },
   location: {
     type: Schema.Types.ObjectId,
     ref: Collections.locations
-  }
+  },
+  likes: [
+    {
+      user: {
+        type: Schema.Types.ObjectId,
+        ref: Collections.users
+      }
+    }
+  ]
 };
 
 Object.assign(EventProps, BaseProps);
