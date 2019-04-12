@@ -27,7 +27,7 @@ exports.GetAll = async (req, res) => {
   }
 };
 
-exports.FetchExplore = (req, res) => {
+exports.FetchExplore = async (req, res) => {
   try {
     const pageNo = parseInt(req.query.pageNo);
     const pageSize = parseInt(req.query.pageSize);
@@ -41,26 +41,19 @@ exports.FetchExplore = (req, res) => {
 
       return res.status(200).json(response);
     } else {
-      // fetch data from database based on given page no and page size
-      let index = parseInt(pageNo - 1) * parseInt(pageSize);
-      const data = [];
+      const sk = (pageNo - 1) * pageSize;
+      const events = await Events.find({})
+        .populate({
+          path: 'location'
+        })
+        .skip(sk)
+        .limit(pageSize)
+        .sort({ start: 'desc' });
 
-      for (let i = 0; i < pageSize - 1; i++) {
-        data.push({
-          index,
-          text: `Data ${index}`
-        });
-        index++;
-      }
-      const response = {
-        success: true,
-        data
-      };
-
-      return res.status(200).json(response);
+      res.json(events);
     }
   } catch (err) {
-    res.status(500).send(err);
+    return res.status(500).json(err);
   }
 };
 
@@ -170,12 +163,29 @@ exports.Like = (req, res) => {
         // Add user id to likes array
         event.likes.unshift({ user: req.user.id });
 
-        event.save().then(eventRes => {
-          event.customProps = {
-            liked: true
-          };
-          res.json({ ...event.customProps, ...event.toJSON() });
+        event.save(err => {
+          if (err) {
+            return res.json(500, {
+              error: 'Cannot save the post'
+            });
+          }
+          event.populate('group', 'name').populate(
+            {
+              path: 'location',
+              select: 'name formatted_address'
+            },
+            (error, doc) => {
+              res.json(doc);
+            }
+          );
         });
+
+        // event.save().then(eventRes => {
+        //   event.populate({
+        //     path: 'location'
+        //   });
+        //   res.json(eventRes);
+        // });
       })
       .catch(err => res.status(404).json({ eventnotfound: 'No event found' }));
   });
@@ -204,11 +214,22 @@ exports.Unlike = (req, res) => {
         event.likes.splice(removeIndex, 1);
 
         // Save
-        event.save().then(event => {
-          event.customProps = {
-            liked: false
-          };
-          res.json({ ...event.customProps, ...event.toJSON() });
+
+        event.save(err => {
+          if (err) {
+            return res.json(500, {
+              error: 'Cannot save the post'
+            });
+          }
+          event.populate('group', 'name').populate(
+            {
+              path: 'location',
+              select: 'name formatted_address'
+            },
+            (error, doc) => {
+              res.json(doc);
+            }
+          );
         });
       })
       .catch(err => res.status(404).json({ eventnotfound: 'No event found' }));

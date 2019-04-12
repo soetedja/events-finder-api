@@ -5,9 +5,26 @@ const passport = require('passport');
 // Load controller
 const EventController = require('../controllers/event.controller');
 
-// @route   GET api/events
-// @desc    Get all events
-// @access  Private
+/**
+ * @swagger
+ * /events:
+ *   get:
+ *     tags:
+ *       - Event
+ *     name: Get all events
+ *     summary: Get all events
+ *     security:
+ *       - bearerAuth: []
+ *     consumes:
+ *       - application/json
+ *     produces:
+ *       - application/json
+ *     responses:
+ *       200:
+ *         description: List of events
+ *       401:
+ *         description: No auth token
+ */
 router.get(
   '/',
   passport.authenticate('jwt', { session: false }),
@@ -38,7 +55,7 @@ router.post(
 router.get(
   '/fetchExplore',
   passport.authenticate('jwt', { session: false }),
-  EventController.Fetch
+  EventController.FetchExplore
 );
 
 // @route   POST api/events/like

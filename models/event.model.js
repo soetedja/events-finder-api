@@ -33,6 +33,9 @@ const EventProps = {
     type: Schema.Types.ObjectId,
     ref: Collections.locations
   },
+  liked: {
+    type: Schema.Types.Boolean
+  },
   likes: [
     {
       user: {

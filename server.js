@@ -2,16 +2,21 @@ const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const passport = require('passport');
+// const swaggerUi = require('swagger-ui-express');
 // const path = require('path');
-
+const swaggerDoc = require('./swagger/swaggerDoc');
 const users = require('./routes/user.route');
 const events = require('./routes/event.route');
 
 const app = express();
 
+swaggerDoc(app);
+
 // Body parser middleware
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
+
+// app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 // DB config
 const db = require('./config/keys').mongoURI;
